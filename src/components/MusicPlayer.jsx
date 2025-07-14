@@ -15,7 +15,9 @@ const MusicPlayer = ({ currentTrack,
   metadata,
   setMetadata,
   setIsPlaying,
-  setCurrentTrack }) => {
+  setCurrentTrack,
+  onNext,
+  onPrevious }) => {
   const progressRef = useRef(null);
   const audioRef = useRef(null);
 
@@ -104,83 +106,105 @@ const MusicPlayer = ({ currentTrack,
     setDuration(0);
   };
 
-  console.log('Metadata:', metadata);
-
-
 
   return (
-    <div className="player-center">
-      <div className="player-card playerSection">
-        <div className="cover-art">
-          {metadata?.picture || metadata?.album_image ? (
-            <img
-              src={metadata.picture || metadata.album_image}
-              alt="Album Art"
-              className="cover-img"
-            />
-          ) : (
-            <div className="cover-placeholder">cover art</div>
-          )}
-        </div>
-
-
-        <div className="song-title">
-          <p>{metadata?.title}</p>
-          <marquee>{metadata?.artist} - {metadata?.album}</marquee>
-        </div>
-
-        <div className="progress-bar" ref={progressRef} onClick={handleSeek}>
-          <div className="progress-fill" style={{ width: `${progress}%` }} />
-        </div>
-
-        <div className="timestamps">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
-        </div>
-
-        <div className="control-buttons-box">
-          <button><CgPlayListAdd /></button>
-          <button><MdSkipPrevious /></button>
-          <button onClick={togglePlay}>
-            {isPlaying ? <FaPauseCircle /> : <FaPlayCircle />}
-          </button>
-          <button><MdSkipNext /></button>
-
-          <div className="volume-container">
-            <button onClick={() => setShowVolumeSlider(!showVolumeSlider)}>
-              <IoMdVolumeHigh />
-            </button>
-            {showVolumeSlider && (
-              <div className="volume-slider">
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={volume}
-                  onChange={handleVolumeChange}
-                  className="vertical-slider"
-                />
-              </div>
+    <div
+      className="player-root"
+      style={{
+        backgroundImage:
+          metadata?.picture || metadata?.album_image
+            ? `url(${metadata.picture || metadata.album_image})`
+            : "none",
+      }}
+    >
+      <div className="player-overlay" />
+      <div className="player-center">
+        <div className="player-card playerSection">
+          <div className="cover-art">
+            {metadata?.picture || metadata?.album_image ? (
+              <img
+                src={metadata.picture || metadata.album_image}
+                alt="Album Art"
+                className="cover-img"
+              />
+            ) : (
+              <div className="cover-placeholder">cover art</div>
             )}
           </div>
 
-          <div className="file-upload">
+          <div className="song-title">
+            <p>{metadata?.title}</p>
+            <div className="artist">{metadata?.artist} - {metadata?.album}</div>
+          </div>
+
+          <div className="progress-row">
+            <span className="time-start">{formatTime(currentTime)}</span>
+
+            <div className="progress-bar" ref={progressRef} onClick={handleSeek}>
+              <div className="progress-fill" style={{ width: `${progress}%` }} />
+            </div>
+
+            <span className="time-end">{formatTime(duration)}</span>
+          </div>
+
+
+          {/* <div className="progress-bar" ref={progressRef} onClick={handleSeek}>
+            <div className="progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+
+          <div className="timestamps">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
+          </div> */}
+
+          <div className="control-buttons-box">
+            <div className="volume-container">
+              <button onClick={() => setShowVolumeSlider(!showVolumeSlider)}>
+                <IoMdVolumeHigh />
+              </button>
+              {showVolumeSlider && (
+                <div className="volume-slider">
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={handleVolumeChange}
+                    className="vertical-slider"
+                  />
+                </div>
+              )}
+            </div>
+
+            <button onClick={onPrevious}><MdSkipPrevious /></button>
+            <button onClick={togglePlay}>
+              {isPlaying ? <FaPauseCircle /> : <FaPlayCircle />}
+            </button>
+            <button onClick={onNext}><MdSkipNext /></button>
+
             <label className="upload-label">
               <IoMdAdd />
-              <input type="file" accept="audio/*" onChange={handleFileSelect} style={{ display: "none" }} />
+              <input
+                type="file"
+                accept="audio/*"
+                onChange={handleFileSelect}
+                style={{ display: "none" }}
+              />
             </label>
           </div>
-        </div>
 
-        <audio
-          ref={audioRef}
-          src={currentTrack}
-          onTimeUpdate={handleTimeUpdate}
-          autoPlay={isPlaying}
-        />
+          <audio
+            ref={audioRef}
+            src={currentTrack}
+            onTimeUpdate={handleTimeUpdate}
+            autoPlay={isPlaying}
+          />
+        </div>
       </div>
     </div>
+
+
   );
 };
 
